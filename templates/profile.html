@@ -22,8 +22,22 @@
       </ul>
     </nav>
     <br>
-    <h3>Welcome {{ user }}</h3>
+    <h3>Welcome {{user}}</h3>
     <br>
+    <h4>New Requests</h4>
+    {% for i in new %}
+      <div class="card">
+        <div class="card-body">
+          {{ i }}
+          <a href="#" class="card-link">View</a>
+          <a href="#" class="card-link">Accept</a>
+          <a href="#" class="card-link">Reject</a>
+        </div>
+      </div>
+    {% endfor %}
+    <br>
+    <br>
+    
     <h4>Active Campaigns</h4>
   
       {% for i in active %}
@@ -35,19 +49,7 @@
       </div>
       {% endfor %}
     <br>
-    <br>
-    <h4>New Requests</h4>
-    {% for i in content %}
-      <div class="card">
-        <div class="card-body">
-          {{ i }}
-          <a href="#" class="card-link">View</a>
-          <a href="#" class="card-link">Accept</a>
-          <a href="#" class="card-link">Reject</a>
-        </div>
-      </div>
-    {% endfor %}
-    <br>
-    <a href="campaign.html">+ See all Campaigns</a>
+    
+
     </body>
 </html>
