@@ -1,25 +1,55 @@
+{# Jinja2 #}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stats</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
+    <title>Stats for {{ user_type.capitalize() }} (ID: {{ user_id }})</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        .chart-container { width: 80%; margin: 20px auto; }
+    </style>
 </head>
 <body>
-    <nav style="font-size: larger;">
-    <ul class="nav nav-tabs sticky-top" style="background-color: #e3f2fd;">
-        <li class="nav-item">
-          <a class="nav-link" href="/home">Profile</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/find">Find</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Stats</a>
-        </li>
-      </ul>
-    </nav>
-    </body>
+    <h1>Stats for {{ user_type.capitalize() }} (ID: {{ user_id }})</h1>
+    
+    <div class="chart-container">
+        <canvas id="chart1"></canvas>
+    </div>
+    
+    <div class="chart-container">
+        <canvas id="chart2"></canvas>
+    </div>
+    
+    {% if is_admin %}
+    <div class="chart-container">
+        <canvas id="chart3"></canvas>
+    </div>
+    
+    <div class="chart-container">
+        <canvas id="chart4"></canvas>
+    </div>
+    {% endif %}
+
+    <script>
+        // Chart data will be injected by Flask
+        var chartData = {{ chart_data | tojson | safe }};
+        
+        // Chart 1
+        new Chart(document.getElementById('chart1'), chartData.chart1);
+        
+        // Chart 2
+        new Chart(document.getElementById('chart2'), chartData.chart2);
+        
+        {% if is_admin %}
+        // Chart 3 (Admin only)
+        new Chart(document.getElementById('chart3'), chartData.chart3);
+        
+        // Chart 4 (Admin only)
+        new Chart(document.getElementById('chart4'), chartData.chart4);
+        {% endif %}
+    </script>
+</body>
 </html>
+

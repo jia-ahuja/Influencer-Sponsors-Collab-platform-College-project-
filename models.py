@@ -62,7 +62,7 @@ class Sponsor_Requests(db.Model):    ## requests from influencer to sponsor
     cid = db.Column(db.Integer,db.ForeignKey("campaigns.cid"),nullable=False)
     payment = db.Column(db.Integer, nullable = False)
     message = db.Column(db.String, nullable = True)
-    status = db.Column(db.Integer,nullable=False) ## 0 > pending, 1 > accepted, 2 > rejected
+    status = db.Column(db.Integer,nullable=False) ## 0 > pending, 1 > accepted, 2 > rejected, 3 > completed
     sp = db.Column(db.Integer,db.ForeignKey("sponsor_user_info.user_id"),nullable=False)
     inf = db.Column(db.Integer,db.ForeignKey("influencer_user_info.user_id"),nullable=False)
 
@@ -76,5 +76,11 @@ class Influencer_Requests(db.Model):   ## requests from sponsor to influencer
     sp = db.Column(db.Integer,db.ForeignKey("sponsor_user_info.user_id"),nullable=False)
     payment = db.Column(db.Integer, nullable = False)
     message = db.Column(db.String, nullable = True)
-    status = db.Column(db.Integer,nullable=False)
+    status = db.Column(db.Integer,nullable=False)  ## 0 > pending, 1 > accepted, 2 > rejected, 3 > completed
 
+
+class Flagged_users(db.Model):
+    __tablename__ = "flagged"
+    row_id = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    user_id = db.Column(db.Integer, nullable = False)
+    role = db.Column(db.Integer, nullable = False) ## 0 > influencer, 1 > sponsor

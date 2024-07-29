@@ -11,7 +11,7 @@
     <nav style="font-size: larger;">
     <ul class="nav nav-tabs sticky-top" style="background-color: #e3f2fd;">
         <li class="nav-item">
-          <a class="nav-link" href="/home">Profile</a>
+          <a class="nav-link" href="/influencer/{{influencer.user_id}}">Profile</a>
         </li>
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="#">Find</a>
@@ -35,38 +35,90 @@
       <li>{{row.cname}} - budget: {{row.budget}} - niche: {{row.niche}} 
         
         <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal{{row.cid}}">
           View
         </button>
 
         <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="modal{{row.cid}}" tabindex="-1" aria-labelledby="modalLabel{{row.cid}}" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <h5 class="modal-title" id="modalLabel{{row.cid}}">{{row.cname}}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                Campaign name : {{row.cname}} <br>
+                Campaign id   : {{row.cid}} <br>
                 Niche         : {{row.niche}}  <br>
                 Description   : {{row.description}}  <br>
                 Budget        : {{row.budget}}  <br>
                 Requirements  : {{row.requirements}}  <br>
                 Date created  : {{row.date_created}}  <br>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Request</button>
-              </div>
+                <hr>
+                <form id="requestForm{{row.cid}}">
+                    <div class="mb-3">
+                        <label for="payment{{row.cid}}" class="form-label">Payment Amount</label>
+                        <input type="number" class="form-control" id="payment{{row.cid}}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message{{row.cid}}" class="form-label">Message</label>
+                        <textarea class="form-control" id="message{{row.cid}}" rows="3"></textarea>
+                    </div>
+                </form>
             </div>
-          </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary send-request" data-campaign-id="{{row.cid}}">Send Request</button>
+            </div>
         </div>
-              
-      </li>
-      {% endfor %}
+    </div>
+</div>
+</li>
+{% endfor %}
+</ul>
 
-    </ul>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+const requestButtons = document.querySelectorAll('.send-request');
+const influencerId = '{{ influencer.user_id }}';
+
+
+requestButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        const campaignId = this.getAttribute('data-campaign-id');
+        const payment = document.getElementById(`payment${campaignId}`).value;
+        const message = document.getElementById(`message${campaignId}`).value;
+        
+        fetch('/camp_request', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                influencer_id: influencerId,
+                campaign_id: campaignId,
+                payment: payment,
+                message: message
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Request sent successfully!');
+                const modal = bootstrap.Modal.getInstance(document.getElementById(`modal${campaignId}`));
+                modal.hide();
+            } else {
+                alert('Failed to send request: ' + data.message);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('An error occurred while sending the request.');
+        });
+    });
+});
+});
+</script>
+</body>
 </html>

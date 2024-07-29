@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+</head>
+<body>
+    <nav style="font-size: larger;">
+    <ul class="nav nav-tabs sticky-top" style="background-color: #e3f2fd;">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/stats/{{role}}/{{user.user_id}}">Stats</a>
+        </li>
+      </ul>
+    </nav>
+    <br>
+    <h3>Welcome {{user.fname}}</h3>
+    <br>
+    {% if msg and status %}
+     <div class="alert alert-{{ status }}">{{ msg }}</div>
+    {% endif %}
+    <br>
+    <h4>New Requests</h4>
+    {% for campaign, payment, message, influencer in new %}
+      <div class="card">
+        <div class="card-body">
+          Request from: {{ influencer.user_name }}
+          <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nrmodal{{campaign.cid}}">
+            View
+          </button>
+  
+          <!-- Modal -->
+          <div class="modal fade" id="nrmodal{{campaign.cid}}" tabindex="-1" aria-labelledby="nrmodalLabel{{campaign.cid}}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="nrmodalLabel{{campaign.cid}}">{{campaign.cname}}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <h6>Influencer Details: </h6>
+                  Full name     : {{influencer.fname}} <br>
+                  Niche         : {{influencer.niche}}  <br>
+                  Email         : {{influencer.email}}  <br>
+                  Social media  : {{influencer.link}}  <br>
+                  Followers     : {{influencer.reach}}  <br>
+                  Age           : {{influencer.age}}  <br>
+                  <hr>
+                  <h6>Request Details: </h6>
+                  Requested Payment: {{payment}} <br>
+                  Message: <br>
+                  {{message}}
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <form action="{{ url_for('handle_sp_request', cid=campaign.cid, inf = influencer.user_id, action='accept') }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-success">Accept</button>
+                  </form>
+                  <form action="{{ url_for('handle_sp_request', cid=campaign.cid, inf = influencer.user_id, action='reject') }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Reject</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+                
+          
+        </div>
+      </div>
+    {% endfor %}
+    <br>
+    <br>
+    <a href="/add/{{user.user_id}}">
+    <button type="button" class="btn btn-outline-success" style="align-items: center;"> + Add new campaign </button>
+    </a>
+    <br>
+    <br>
+    
+    <h4>Active Campaigns</h4>
+  
+      {% for row in active %}
+      <div class="card">
+        <div class="card-body">
+            {{row.cname}} - budget: {{row.budget}} - niche: {{row.niche}} 
+          <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#activeModal{{row.cid}}">
+            View
+          </button>
+  
+          <!-- Modal -->
+          <div class="modal fade" id="activeModal{{row.cid}}" tabindex="-1" aria-labelledby="activeModalLabel{{row.cid}}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="activeModalLabel{{row.cid}}">{{row.cname}}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Niche         : {{row.niche}}  <br>
+                  Description   : {{row.description}}  <br>
+                  Budget        : {{row.budget}}  <br>
+                  Requirements  : {{row.requirements}}  <br>
+                  Date created  : {{row.date_created}}  <br>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <a href = "/sponsor/c/{{row.cid}}"><button type="button" class="btn btn-primary">Influencers</button></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {%endfor%}
+    <br>
+    <br>
+    
+ 
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    </body>
+</html>
