@@ -8,26 +8,28 @@
 
 </head>
 <body>
+  
+  <br>
   <h3>Campaigns</h3>
   <br>
     <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for row in campaigns %}
+        {% for row in campaign %}
         <div class="col" style="padding-top: 2%;">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">{{row.cname}}</h5>
-              <p class="card-text">{{row.description}}</p>
+              <p class="card-text">In {{row.niche}}</p>
                 <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal{{row.cid}}">
           View
         </button>
 
         <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="modal{{row.cid}}" tabindex="-1" aria-labelledby="modalLabel{{row.cid}}" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <h5 class="modal-title" id="modalLabel{{row.cid}}">Campaign ID {{row.cid}}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
@@ -41,7 +43,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">See influencers</button>
+                <a href = "/c/{{row.cid}}"><button type="button" class="btn btn-primary">Influencers</button></a>
               </div>
             </div>
           </div>

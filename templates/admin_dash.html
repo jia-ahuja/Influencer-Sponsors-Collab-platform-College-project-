@@ -4,14 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
-    <ol>
-        <li><a href="/dash/influencers">See all Influencers</a></li>
-        <li><a href="/dash/sponsors">See all Sponsors</a></li>
-        <li><a href="/dash/activecampaigns">See all Active Campaigns</a></li>
-        <li><a href="/dash/allcampaigns">See all Campaigns</a></li>
-        <li><a href="/dash/adrequests">See all Ad requests</a></li>
-    </ol>
-</body>
+
+    <nav style="font-size: larger;">
+        <ul class="nav nav-tabs sticky-top" style="background-color: #e3f2fd;">
+            <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/stats/{{role}}/{{user_id}}">Stats</a></li>
+            <li class="nav-item"><a class="nav-link" href="/dash/{{user_id}}/influencers">Influencers</a></li>
+            <li class="nav-item"><a class="nav-link" href="/dash/{{user_id}}/sponsors">Sponsors</a></li>
+            <li class="nav-item"><a class="nav-link" href="/dash/activecampaigns">Active Campaigns</a></li>
+            <li class="nav-item"><a class="nav-link" href="/dash/allcampaigns">All Campaigns</a></li>
+            <li class="nav-item"><a class="nav-link" href="/dash/{{user_id}}/adrequests">Ad requests</a></li>
+          </ul>
+    </nav>
+    <br>
+    <h3>Flagged Influencers</h3>
+    <ul>
+        {%for row in influencer%}
+        <li>{{row.user_name}} - niche: {{row.niche}} - reach: {{row.reach}}
+          
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal{{row.user_id}}">
+              View
+            </button>
+    
+            <!-- Modal -->
+            <div class="modal fade" id="modal{{row.user_id}}" tabindex="-1" aria-labelledby="modalLabel{{row.user_id}}" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel{{row.user_id}}">{{row.user_name}}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    Full name     : {{row.fname}} <br>
+                    Niche         : {{row.niche}}  <br>
+                    Email         : {{row.email}}  <br>
+                    Social media  : {{row.link}}  <br>
+                    Followers     : {{row.reach}}  <br>
+                    Age           : {{row.age}}  <br>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form action="{{ url_for('unflag', uid=row.user_id, role=0) }}" method="POST" style="display: inline;">
+                      <button type="submit" class="btn btn-success">Unflag</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+                  
+  
+        </li>
+        {%endfor%}
+      </ul>
+      <br>
+      <br>
+    <h3>Flagged Sponsors</h3>
+    <br>
+    <ul>
+      {%for row in sponsor%}
+      <li>{{row.user_name}} - company name: {{row.cname}} - industry: {{row.industry}}
+        
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#spModal{{row.user_id}}">
+            View
+          </button>
+  
+          <!-- Modal -->
+          <div class="modal fade" id="spModal{{row.user_id}}" tabindex="-1" aria-labelledby="spModalLabel{{row.user_id}}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="spModalLabel{{row.user_id}}">{{row.user_name}}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  Full name     : {{row.fname}} <br>
+                  Company name  : {{row.cname}} <br>
+                  Industry      : {{row.industry}}  <br>
+                  Email         : {{row.email}}  <br>
+                  Social link   : {{row.link}}  <br>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <form action="{{ url_for('unflag', uid=row.user_id, role=0) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-success">Unflag</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+                
+
+      </li>
+      {%endfor%}
+    </ul>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    </body>
 </html>

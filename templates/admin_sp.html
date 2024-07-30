@@ -8,9 +8,20 @@
 
 </head>
 <body>
+  <nav style="font-size: larger;">
+    <ul class="nav nav-tabs sticky-top" style="background-color: #e3f2fd;">
+        <li class="nav-item"><a class="nav-link" href="/dash">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/stats/{{role}}/{{user_id}}">Stats</a></li>
+        <li class="nav-item"><a class="nav-link" href="/dash/{{user_id}}/influencers">Influencers</a></li>
+        <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">Sponsors</a></li>
+        <li class="nav-item"><a class="nav-link" href="/dash/activecampaigns">Active Campaigns</a></li>
+        <li class="nav-item"><a class="nav-link" href="/dash/allcampaigns">All Campaigns</a></li>
+        <li class="nav-item"><a class="nav-link" href="/dash/{{user_id}}/adrequests">Ad requests</a></li>
+    </ul>
+  </nav>
     <h3>Sponsors list</h3>
     <br>
-    <form class="d-flex" action="/sponsor/find" method="get" role="search">
+    <form class="d-flex" action="/dash/{{user_id}}/sponsors" method="get" role="search">
       <input class="form-control me-2" name="search" type="search" placeholder="Search"
           aria-label="Search">
       <button class="btn btn-outline-success" type="submit">Search</button>
@@ -21,16 +32,16 @@
       <li>{{row.user_name}} - company name: {{row.cname}} - industry: {{row.industry}}
         
         <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal{{row.user_id}}">
             View
           </button>
   
           <!-- Modal -->
-          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal fade" id="modal{{row.user_id}}" tabindex="-1" aria-labelledby="modalLabel{{row.user_id}}" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">{{row.user_name}}</h5>
+                  <h5 class="modal-title" id="modalLabel{{row.user_id}}">{{row.user_name}}</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -42,7 +53,9 @@
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary">Flag</button>
+                  <form action="{{ url_for('flag', role = 0, uid = row.user_id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Flag user</button>
+                  </form>
                 </div>
               </div>
             </div>

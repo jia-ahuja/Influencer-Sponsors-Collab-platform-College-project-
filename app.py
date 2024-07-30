@@ -54,8 +54,9 @@ def admin_login():
         user = request.form['username']
         pswd = request.form['password']
         check, aid = check_user(user, pswd, 'admin')
+
         if check:
-            return redirect(url_for('admin_dashboard'))
+            return redirect(url_for('admin_dashboard', uid = aid.user_id))
 
 
 
@@ -110,12 +111,16 @@ def registerS():
 ################ ADMIN DASHBOARD AND FEATURES ###############################
 ###########################################################################
 
-@app.route('/dash')
-def admin_dashboard():
-    return render_template('admin_dash.html')
+@app.route('/dash/<int:uid>')
+def admin_dashboard(uid):
+    if request.method == 'GET':
+        inf = Flagged_users.query.filter_by(role = 0).all()
+        spn = Flagged_users.query.filter_by(role = 1).all()
+        return render_template('admin_dash.html', influencer = inf, sponsor = spn, user_id = uid, role = "admin")
+    
 
-@app.route('/dash/influencers')
-def admin_inf():
+@app.route('/dash/<int:uid>/influencers')
+def admin_inf(uid):
     if request.method == "GET":
         search = request.args.get("search")
         if search:
@@ -127,11 +132,11 @@ def admin_inf():
         else:
             content = Influencer.query.all()
         
-    return render_template('admin_inf.html', content = content)
+    return render_template('admin_inf.html', content = content, user_id = uid, role = "admin")
     
 
-@app.route('/dash/sponsors')
-def admin_sp():
+@app.route('/dash/<int:uid>/sponsors')
+def admin_sp(uid):
     if request.method == "GET":
         search = request.args.get("search")
         if search:
@@ -143,38 +148,60 @@ def admin_sp():
         else:
             content = Sponsor.query.all()
         
-    return render_template('admin_sp.html', content = content)
+    return render_template('admin_sp.html', content = content, user_id = uid, role = "admin")
 
 
 @app.route('/dash/allcampaigns')
 def admin_allcamp():
     if request.method == 'GET':
         content = Campaigns.query.all()
-        return render_template('campaign.html', content = content)
+        return render_template('campaign.html', campaign = content)
     
 
 @app.route('/dash/activecampaigns')
 def admin_actcamp():
     if request.method == 'GET':
-        content = Campaigns.query.filter(Campaigns.date_end < datetime.now()).all()
-        return render_template('campaign.html', content = content)
+        content = Campaigns.query.filter(Campaigns.date_end >= datetime.now()).all()
+        return render_template('campaign.html', campaign = content)
     
 
-@app.route('/dash/adrequests')
-def admin_adreq():
+@app.route('/dash/<int:uid>/adrequests')
+def admin_adreq(uid):
     if request.method == 'GET':
-        content = Influencer_Requests.query.all()
-        content += Sponsor_Requests.query.all()
-        return render_template('admin_info', content = content)
+        # in_req = Influencer_Requests.query.all()
+        in_req = db.session.query(Campaigns.cid, Campaigns.cname, Influencer_Requests.payment, Influencer_Requests.status, 
+                                  Sponsor.user_id, Sponsor.user_name, Sponsor.industry,
+                                  Influencer.user_id, Influencer.user_name, Influencer.niche)\
+            .join(Influencer_Requests, Campaigns.cid == Influencer_Requests.cid)\
+            .join(Influencer, Influencer.user_id == Influencer_Requests.inf)\
+            .join(Sponsor, Sponsor.user_id == Influencer_Requests.sp)\
+            .all()
+
+        # sp_req = Sponsor_Requests.query.all()
+        sp_req = db.session.query(Campaigns.cid, Campaigns.cname, Sponsor_Requests.payment, Sponsor_Requests.status, 
+                                  Sponsor.user_id, Sponsor.user_name, Sponsor.industry,
+                                  Influencer.user_id, Influencer.user_name, Influencer.niche)\
+            .join(Sponsor_Requests, Campaigns.cid == Sponsor_Requests.cid)\
+            .join(Influencer, Influencer.user_id == Sponsor_Requests.inf)\
+            .join(Sponsor, Sponsor.user_id == Sponsor_Requests.sp)\
+            .all()
+
+        return render_template('admin_adreq.html', in_req = in_req, sp_req = sp_req, user_id = uid, role = "admin")
 
 
-@app.route('/dash/flagged')
-def admin_flag():
-    if request.method == 'GET':
-        inf = Flagged_users.query.filter_by(role = 0).all()
-        spn = Flagged_users.query.filter_by(role = 1).all()
-        return render_template('admin_flag.html', influencer = inf, sponsor = spn)
+@app.route('/flag/<int:role>/<int:uid>', methods = ['POST'])
+def flag(uid, role):
+    flag_user = Flagged_users(user_id = uid, role = role)
+    db.session.add(flag_user)
+    db.session.commit()
+    return f"<h4>Flagged User {uid}</h4>"
 
+
+@app.route('/unflag/<int:role>/<int:uid>', methods = ['POST'])
+def unflag(uid, role):
+    user = Flagged_users.query.filter_by(user_id = uid, role = role).delete()
+    db.session.commit()
+    return f"<h4>UnFlagged User {uid}</h4>"
 
 
 #####################################################
@@ -280,7 +307,7 @@ def sp_dashboard(uname):
         return render_template('profilesp.html', user=usr, active=active, new=new, role="sponsor", msg=msg, status=status)
 
 
-@app.route('/sponsor/c/<string:cid>')
+@app.route('/c/<string:cid>')
 def camp_influencers(cid):
     infs = Influencer_Requests.query.filter(Influencer_Requests.cid == cid).all()
     infs += Sponsor_Requests.query.filter(Sponsor_Requests.cid == cid, Sponsor_Requests.status != 2).all()
